@@ -28,7 +28,7 @@ ATTR_CMD = "cmd"
 ATTR_PAYLOAD = "payload"
 ATTR_PORTIONS = "portions"
 
-PLATFORMS = ["light", "switch"]
+PLATFORMS = ["light", "sensor", "switch"]
 
 CMD_ATTR_SET = "ATTR_SET_SERVICE"
 CMD_ATTR_GET = "ATTR_GET_SERVICE"
