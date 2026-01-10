@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Petlibro Local for MQTT",
+        "description": "Control your Petlibro feeder locally via MQTT",
+        "data": {
+          "model": "Model",
+          "serial": "Serial Number",
+          "name": "Name (optional)"
+        },
+        "data_description": {
+          "model": "Device model (e.g., PLAF103)",
+          "serial": "Device serial number (e.g., AF01013100028744B9099Z)"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This device is already configured."
+    }
+  }
+}
