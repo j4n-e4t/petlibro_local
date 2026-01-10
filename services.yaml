@@ -2,11 +2,19 @@ feed:
   name: Feed
   description: Trigger manual feeding with a specified number of portions.
   fields:
+    device_id:
+      name: Device
+      description: The Petlibro device to feed from.
+      required: true
+      selector:
+        device:
+          integration: petlibro_local
     portions:
       name: Portions
       description: Number of portions to dispense.
       required: true
       example: 1
+      default: 1
       selector:
         number:
           min: 1
@@ -15,8 +23,15 @@ feed:
 
 send_command:
   name: Send Command
-  description: Send a command to the MQTT bridge device.
+  description: Send a command to a Petlibro device.
   fields:
+    device_id:
+      name: Device
+      description: The Petlibro device to send the command to.
+      required: true
+      selector:
+        device:
+          integration: petlibro_local
     cmd:
       name: Command
       description: The command to send.
