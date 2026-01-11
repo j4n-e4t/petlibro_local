@@ -5,8 +5,14 @@ from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
 from homeassistant.const import CONF_NAME
+from homeassistant.core import callback
 
 from .const import CONF_MODEL, CONF_SERIAL, DOMAIN
 
@@ -15,6 +21,12 @@ class PetlibroLocalConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Petlibro Local."""
 
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        """Get the options flow for this handler."""
+        return PetlibroLocalOptionsFlow(config_entry)
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -40,4 +52,37 @@ class PetlibroLocalConfigFlow(ConfigFlow, domain=DOMAIN):
                 }
             ),
             errors=errors,
+        )
+
+
+class PetlibroLocalOptionsFlow(OptionsFlow):
+    """Handle options flow for Petlibro Local."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        """Initialize options flow."""
+        self._config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Manage the options."""
+        if user_input is not None:
+            # Update the config entry title if name changed
+            new_name = user_input.get(CONF_NAME)
+            if new_name:
+                self.hass.config_entries.async_update_entry(
+                    self._config_entry,
+                    title=new_name,
+                )
+            return self.async_create_entry(title="", data=user_input)
+
+        current_name = self._config_entry.title
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=current_name): str,
+                }
+            ),
         )

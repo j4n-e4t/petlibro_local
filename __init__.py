@@ -162,7 +162,7 @@ def _register_services(hass: HomeAssistant) -> None:
                 grainNum=portions,
             )
 
-            _LOGGER.info(
+            _LOGGER.debug(
                 "Manual feeding: %d portion(s) to device %s",
                 portions,
                 entry.data[CONF_SERIAL],
@@ -201,3 +201,14 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hass.services.async_remove(DOMAIN, SERVICE_FEED)
 
     return unload_ok
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
+) -> bool:
+    """Remove a config entry from a device.
+
+    Since each config entry represents a single device, removing the device
+    means removing the entire config entry.
+    """
+    return True

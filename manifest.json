@@ -4,8 +4,9 @@
   "codeowners": ["@j4n-e4t"],
   "config_flow": true,
   "dependencies": ["mqtt"],
-  "documentation": "",
+  "documentation": "https://github.com/j4n-e4t/petlibro_local",
   "iot_class": "local_push",
+  "loggers": ["petlibro_local"],
   "requirements": [],
   "version": "0.1.0",
   "integration_type": "device"

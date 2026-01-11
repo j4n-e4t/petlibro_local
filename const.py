@@ -1,5 +1,7 @@
 """Constants for the Petlibro Local integration."""
 
+from homeassistant.const import Platform
+
 DOMAIN = "petlibro_local"
 
 CONF_MODEL = "model"
@@ -28,7 +30,12 @@ ATTR_CMD = "cmd"
 ATTR_PAYLOAD = "payload"
 ATTR_PORTIONS = "portions"
 
-PLATFORMS = ["button", "event", "light", "switch"]
+PLATFORMS: list[Platform] = [
+    Platform.BUTTON,
+    Platform.EVENT,
+    Platform.LIGHT,
+    Platform.SWITCH,
+]
 
 CMD_ATTR_SET = "ATTR_SET_SERVICE"
 CMD_ATTR_GET = "ATTR_GET_SERVICE"

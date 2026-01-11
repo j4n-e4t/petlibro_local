@@ -40,7 +40,7 @@ async def async_setup_entry(
 class PetlibroGrainOutputEvent(PetlibroBaseEntity, EventEntity):
     """Event entity for grain output (food dispensed)."""
 
-    _attr_name = "Grain Dispensed"
+    _attr_translation_key = "grain_dispensed"
     _attr_icon = "mdi:shaker-outline"
     _attr_event_types = ["grain_dispensed"]
 
@@ -84,7 +84,7 @@ class PetlibroGrainOutputEvent(PetlibroBaseEntity, EventEntity):
                     "message_id": payload.get("msgId"),
                 },
             )
-            _LOGGER.info(
+            _LOGGER.debug(
                 "Grain output event: %d portion(s) dispensed",
                 grain_num,
             )

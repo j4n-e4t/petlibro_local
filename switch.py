@@ -124,7 +124,7 @@ class PetlibroBaseSwitch(PetlibroBaseEntity, SwitchEntity):
 class PetlibroChildLockSwitch(PetlibroBaseSwitch):
     """Representation of the Petlibro hardware button lock switch."""
 
-    _attr_name = "Hardware Button Lock"
+    _attr_translation_key = "hardware_button_lock"
     _attr_icon = "mdi:lock"
     _state_key = "disableHardwareButton"
 
@@ -149,7 +149,7 @@ class PetlibroChildLockSwitch(PetlibroBaseSwitch):
 class PetlibroSoundSwitch(PetlibroBaseSwitch):
     """Representation of the Petlibro sound switch."""
 
-    _attr_name = "Sound"
+    _attr_translation_key = "sound"
     _attr_icon = "mdi:volume-high"
     _state_key = "soundSwitch"
 

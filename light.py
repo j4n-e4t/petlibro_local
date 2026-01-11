@@ -44,7 +44,7 @@ async def async_setup_entry(
 class PetlibroIndicatorLight(PetlibroBaseEntity, LightEntity):
     """Representation of the Petlibro indicator lights."""
 
-    _attr_name = "Indicator Lights"
+    _attr_translation_key = "indicator_lights"
     _attr_color_mode = ColorMode.ONOFF
     _attr_supported_color_modes = {ColorMode.ONOFF}
     _attr_entity_category = EntityCategory.CONFIG

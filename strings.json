@@ -18,5 +18,77 @@
     "abort": {
       "already_configured": "This device is already configured."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Petlibro Local Options",
+        "data": {
+          "name": "Device Name"
+        }
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "feed": {
+        "name": "Feed"
+      },
+      "reboot": {
+        "name": "Reboot Device"
+      }
+    },
+    "switch": {
+      "hardware_button_lock": {
+        "name": "Hardware Button Lock"
+      },
+      "sound": {
+        "name": "Sound"
+      }
+    },
+    "light": {
+      "indicator_lights": {
+        "name": "Indicator Lights"
+      }
+    },
+    "event": {
+      "grain_dispensed": {
+        "name": "Grain Dispensed"
+      }
+    }
+  },
+  "services": {
+    "feed": {
+      "name": "Feed",
+      "description": "Trigger manual feeding with a specified number of portions.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Petlibro device to feed from."
+        },
+        "portions": {
+          "name": "Portions",
+          "description": "Number of portions to dispense (1-10)."
+        }
+      }
+    },
+    "send_command": {
+      "name": "Send Command",
+      "description": "Send a raw command to a Petlibro device.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "The Petlibro device to send the command to."
+        },
+        "cmd": {
+          "name": "Command",
+          "description": "The command to send."
+        },
+        "payload": {
+          "name": "Payload",
+          "description": "Additional payload data as a dictionary."
+        }
+      }
+    }
   }
 }

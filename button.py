@@ -40,7 +40,7 @@ async def async_setup_entry(
 class PetlibroFeedButton(PetlibroBaseEntity, ButtonEntity):
     """Button that triggers a manual feeding with 1 portion."""
 
-    _attr_name = "Feed"
+    _attr_translation_key = "feed"
     _attr_icon = "mdi:food-drumstick"
 
     def __init__(
@@ -67,7 +67,7 @@ class PetlibroFeedButton(PetlibroBaseEntity, ButtonEntity):
 class PetlibroRebootButton(PetlibroBaseEntity, ButtonEntity):
     """Button that triggers a device reboot."""
 
-    _attr_name = "Reboot Device"
+    _attr_translation_key = "reboot"
     _attr_icon = "mdi:restart"
     _attr_device_class = ButtonDeviceClass.RESTART
     _attr_entity_category = EntityCategory.CONFIG
