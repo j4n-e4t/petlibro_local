@@ -98,6 +98,7 @@ def _register_services(hass: HomeAssistant) -> None:
 
     service_schema = vol.Schema(
         {
+            vol.Required("device_id"): vol.Any(cv.string, [cv.string]),
             vol.Required(ATTR_CMD): cv.string,
             vol.Optional(ATTR_PAYLOAD, default={}): vol.Any(dict, None),
         }
@@ -105,6 +106,7 @@ def _register_services(hass: HomeAssistant) -> None:
 
     feed_schema = vol.Schema(
         {
+            vol.Required("device_id"): vol.Any(cv.string, [cv.string]),
             vol.Required(ATTR_PORTIONS): cv.positive_int,
         }
     )
