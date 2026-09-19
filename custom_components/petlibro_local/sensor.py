@@ -1,17 +1,16 @@
-"""Date/time platform for Petlibro Local integration.
+"""Sensor platform for Petlibro Local integration.
 
 The feeder reports nothing about when it was last cleaned or refilled, so
-these two timestamps are Home Assistant side bookkeeping. They are writable
-DateTimeEntities rather than read-only sensors so a wrong entry can be
-corrected without editing an automation, and each has a companion button that
-stamps "now".
+these two timestamps are Home Assistant side bookkeeping. They are read-only:
+the only thing that moves them is a press of the matching button, which stamps
+the current time.
 """
 from __future__ import annotations
 
 import logging
 from datetime import datetime
 
-from homeassistant.components.datetime import DateTimeEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, callback
@@ -41,13 +40,13 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            PetlibroMaintenanceDateTime(
+            PetlibroMaintenanceSensor(
                 entry,
                 coordinator,
                 key=MAINTENANCE_LAST_CLEANED,
                 translation_key="last_cleaned",
             ),
-            PetlibroMaintenanceDateTime(
+            PetlibroMaintenanceSensor(
                 entry,
                 coordinator,
                 key=MAINTENANCE_LAST_REFILL,
@@ -57,8 +56,15 @@ async def async_setup_entry(
     )
 
 
-class PetlibroMaintenanceDateTime(PetlibroBaseEntity, DateTimeEntity, RestoreEntity):
-    """A maintenance timestamp kept by Home Assistant."""
+class PetlibroMaintenanceSensor(PetlibroBaseEntity, SensorEntity, RestoreEntity):
+    """A maintenance timestamp kept by Home Assistant.
+
+    Read-only: it is written by its companion button and by nothing else. The
+    timestamp device class is what makes the frontend render it as "3 days
+    ago" rather than as a date, which is the form the question usually takes.
+    """
+
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
 
     def __init__(
         self,
@@ -84,8 +90,8 @@ class PetlibroMaintenanceDateTime(PetlibroBaseEntity, DateTimeEntity, RestoreEnt
     def available(self) -> bool:
         """Return True always.
 
-        This is our own bookkeeping, not device state, so it stays usable while
-        the feeder is offline.
+        This is our own bookkeeping, not device state, so it keeps showing the
+        last known timestamp while the feeder is offline.
         """
         return True
 
@@ -128,9 +134,5 @@ class PetlibroMaintenanceDateTime(PetlibroBaseEntity, DateTimeEntity, RestoreEnt
 
     @callback
     def _handle_update(self, _value: datetime | None) -> None:
-        """Re-render when the value changes, including from its button."""
+        """Re-render when its button stamps a new time."""
         self.async_write_ha_state()
-
-    async def async_set_value(self, value: datetime) -> None:
-        """Set the timestamp to a value picked by the user."""
-        self._coordinator.set_maintenance(self._key, dt_util.as_utc(value))

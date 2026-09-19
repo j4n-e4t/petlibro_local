@@ -57,9 +57,9 @@ ATTR_WAIT_FOR_ACK = "wait_for_ack"
 
 PLATFORMS: list[Platform] = [
     Platform.BUTTON,
-    Platform.DATETIME,
     Platform.EVENT,
     Platform.LIGHT,
+    Platform.SENSOR,
     Platform.SWITCH,
 ]
 

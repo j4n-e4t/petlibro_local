@@ -1,0 +1,124 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Petlibro Local für MQTT",
+        "description": "Steuere deinen Petlibro-Futterautomaten lokal über MQTT",
+        "data": {
+          "model": "Modell",
+          "serial": "Seriennummer",
+          "name": "Name (optional)"
+        },
+        "data_description": {
+          "model": "Gerätemodell (z. B. PLAF103)",
+          "serial": "Seriennummer des Geräts (z. B. AF01013100028744B9099Z)"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Dieses Gerät ist bereits konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Petlibro Local – Optionen",
+        "data": {
+          "name": "Gerätename",
+          "feeding_plan_reply": "Antwort auf Fütterungsplan-Anfragen"
+        },
+        "data_description": {
+          "feeding_plan_reply": "Beim Start fragt der Futterautomat den Broker nach seinem Fütterungsplan und fragt so lange weiter, bis er eine Antwort bekommt. „Nur bestätigen“ antwortet, ohne den auf dem Gerät gespeicherten Plan anzutasten. „Geräteplan löschen“ sendet einen leeren Plan und löscht damit die Fütterungszeiten auf dem Gerät, sodass nur noch Home Assistant füttert."
+        }
+      }
+    }
+  },
+  "selector": {
+    "feeding_plan_reply": {
+      "options": {
+        "ack_only": "Nur bestätigen (Geräteplan behalten)",
+        "empty": "Geräteplan löschen"
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "feed": {
+        "name": "Füttern"
+      },
+      "reboot": {
+        "name": "Gerät neu starten"
+      },
+      "mark_cleaned": {
+        "name": "Als gereinigt markieren"
+      },
+      "mark_refilled": {
+        "name": "Als aufgefüllt markieren"
+      }
+    },
+    "event": {
+      "grain_dispensed": {
+        "name": "Futter ausgegeben"
+      }
+    },
+    "light": {
+      "indicator_lights": {
+        "name": "Statusleuchten"
+      }
+    },
+    "sensor": {
+      "last_cleaned": {
+        "name": "Zuletzt gereinigt"
+      },
+      "last_refill": {
+        "name": "Zuletzt aufgefüllt"
+      }
+    },
+    "switch": {
+      "hardware_button_lock": {
+        "name": "Tastensperre"
+      },
+      "sound": {
+        "name": "Ton"
+      }
+    }
+  },
+  "services": {
+    "feed": {
+      "name": "Füttern",
+      "description": "Löst eine manuelle Fütterung mit einer bestimmten Anzahl Portionen aus.",
+      "fields": {
+        "device_id": {
+          "name": "Gerät",
+          "description": "Der Futterautomat, aus dem gefüttert werden soll."
+        },
+        "portions": {
+          "name": "Portionen",
+          "description": "Anzahl der auszugebenden Portionen (1–10)."
+        }
+      }
+    },
+    "send_command": {
+      "name": "Befehl senden",
+      "description": "Sendet einen rohen Befehl an einen Petlibro-Futterautomaten.",
+      "fields": {
+        "device_id": {
+          "name": "Gerät",
+          "description": "Der Futterautomat, an den der Befehl gesendet werden soll."
+        },
+        "cmd": {
+          "name": "Befehl",
+          "description": "Der zu sendende Befehl."
+        },
+        "payload": {
+          "name": "Nutzdaten",
+          "description": "Zusätzliche Nutzdaten als Dictionary."
+        },
+        "wait_for_ack": {
+          "name": "Auf Bestätigung warten",
+          "description": "Wartet auf die Bestätigung des Geräts auf device/service/post und schlägt fehl, wenn sie ausbleibt. Für Befehle abschalten, die das Gerät nicht beantworten kann, etwa DEVICE_REBOOT."
+        }
+      }
+    }
+  }
+}

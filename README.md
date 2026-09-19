@@ -22,13 +22,14 @@ broker connection rather than opening its own.
 | Feed | `button` | `MANUAL_FEEDING_SERVICE`, one portion |
 | Reboot | `button` | `DEVICE_REBOOT` (never observed on the wire — unverified) |
 | Grain Dispensed | `event` | fires once per dispense, on `GRAIN_END` |
-| Last cleaned | `datetime` | Home Assistant side, survives restarts |
-| Last refill | `datetime` | Home Assistant side, survives restarts |
-| Mark cleaned / Mark refilled | `button` | stamps the matching timestamp with now |
+| Last cleaned | `sensor` | timestamp, Home Assistant side, survives restarts |
+| Last refill | `sensor` | timestamp, Home Assistant side, survives restarts |
+| Mark cleaned / Mark refilled | `button` | stamps the matching sensor with now |
 
 The feeder itself reports nothing about cleaning or refilling, so those four are bookkeeping.
-Press the button for the common case; the `datetime` entities stay writable so a wrong entry
-can be corrected, and they remain available while the feeder is offline.
+The sensors are read-only and carry the `timestamp` device class, so the frontend shows them
+as "3 days ago"; pressing the matching button is the only thing that moves them. They survive
+restarts and stay available while the feeder is offline — you clean it with the power off.
 
 The `Grain Dispensed` event carries `portions`, `expected_portions`, `short_fed` (a dispense
 that fell short means the hopper jammed or ran empty), `feed_type` (`1` scheduled, `2` manual)
@@ -163,6 +164,13 @@ very little contrast on Home Assistant's dark theme, and neither HACS nor brands
 per-theme variants, so swap in the monochrome pair if that bothers you.
 
 Entity and action icons come from `icons.json` and need nothing external.
+
+## Translations
+
+English and German. A custom integration loads `custom_components/petlibro_local/translations/`
+at runtime and never reads `strings.json`, which is only the source file, so the two are kept
+identical and CI fails if they drift — otherwise entity names silently collapse to the bare
+device name.
 
 ## Protocol notes
 

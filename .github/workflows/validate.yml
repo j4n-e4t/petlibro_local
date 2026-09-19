@@ -15,6 +15,46 @@ jobs:
       - uses: actions/checkout@v4
       - uses: home-assistant/actions/hassfest@master
 
+  translations:
+    name: translations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: strings.json and translations/en.json must match
+        run: |
+          # A custom integration loads translations/*.json at runtime and never
+          # reads strings.json. If they drift, entity names silently collapse to
+          # the bare device name.
+          diff -u custom_components/petlibro_local/strings.json \
+                  custom_components/petlibro_local/translations/en.json
+      - name: every translation file must have the same keys as en.json
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, sys
+
+          base = pathlib.Path("custom_components/petlibro_local/translations")
+
+          def paths(d, prefix=()):
+              for k, v in d.items():
+                  if isinstance(v, dict):
+                      yield from paths(v, prefix + (k,))
+                  else:
+                      yield prefix + (k,)
+
+          en = set(paths(json.loads((base / "en.json").read_text())))
+          failed = False
+          for f in sorted(base.glob("*.json")):
+              if f.name == "en.json":
+                  continue
+              keys = set(paths(json.loads(f.read_text())))
+              for label, diff in (("missing", en - keys), ("extra", keys - en)):
+                  if diff:
+                      failed = True
+                      for p in sorted(diff):
+                          print(f"{f.name}: {label} {'/'.join(p)}")
+          sys.exit(1 if failed else 0)
+          PY
+
   hacs:
     name: HACS
     runs-on: ubuntu-latest

@@ -101,9 +101,10 @@ class PetlibroRebootButton(PetlibroDeviceEntity, ButtonEntity):
 
 
 class PetlibroMaintenanceButton(PetlibroBaseEntity, ButtonEntity):
-    """Button that stamps a maintenance timestamp with the current time."""
+    """Button that stamps a maintenance timestamp with the current time.
 
-    _attr_entity_category = EntityCategory.CONFIG
+    This is the only thing that writes the matching sensor.
+    """
 
     def __init__(
         self,
@@ -131,5 +132,6 @@ class PetlibroMaintenanceButton(PetlibroBaseEntity, ButtonEntity):
         return True
 
     async def async_press(self) -> None:
-        """Set the matching timestamp to now."""
+        """Stamp the matching sensor with the current time."""
         self._coordinator.set_maintenance(self._key, dt_util.utcnow())
+        _LOGGER.debug("Marked %s at %s", self._key, dt_util.utcnow())

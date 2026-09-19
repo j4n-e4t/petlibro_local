@@ -6,8 +6,8 @@ import logging
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr
+from homeassistant.core import HomeAssistant, ServiceCall, callback
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 import homeassistant.helpers.config_validation as cv
 
 from .const import (
@@ -83,9 +83,26 @@ def _target_coordinators(
     return [_get_coordinator(hass, device_id) for device_id in device_ids]
 
 
+@callback
+def _async_remove_stale_entities(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Drop registry entries for platforms this integration no longer provides.
+
+    Last cleaned / Last refill were DateTimeEntities in 0.2.0 and are read-only
+    timestamp sensors from 0.3.0 on. Without this the old pair lingers in the
+    registry as unavailable "restored" entities that nothing will ever write.
+    """
+    registry = er.async_get(hass)
+    for entity in er.async_entries_for_config_entry(registry, entry.entry_id):
+        if entity.domain not in (platform.value for platform in PLATFORMS):
+            registry.async_remove(entity.entity_id)
+            _LOGGER.debug("Removed stale entity %s", entity.entity_id)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Petlibro Local from a config entry."""
     hass.data.setdefault(DOMAIN, {})
+
+    _async_remove_stale_entities(hass, entry)
 
     model = entry.data[CONF_MODEL]
     serial = entry.data[CONF_SERIAL]
