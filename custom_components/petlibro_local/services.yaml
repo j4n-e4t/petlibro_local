@@ -46,3 +46,13 @@ send_command:
       example: '{"param1": "value1"}'
       selector:
         object:
+    wait_for_ack:
+      name: Wait for acknowledgement
+      description: >-
+        Wait for the device to acknowledge the command on device/service/post
+        and fail if it does not. Turn this off for commands the device cannot
+        answer, such as DEVICE_REBOOT.
+      required: false
+      default: true
+      selector:
+        boolean:

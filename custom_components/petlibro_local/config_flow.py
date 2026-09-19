@@ -13,8 +13,20 @@ from homeassistant.config_entries import (
 )
 from homeassistant.const import CONF_NAME
 from homeassistant.core import callback
+from homeassistant.helpers.selector import (
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
 
-from .const import CONF_MODEL, CONF_SERIAL, DOMAIN
+from .const import (
+    CONF_FEEDING_PLAN_REPLY,
+    CONF_MODEL,
+    CONF_SERIAL,
+    DEFAULT_FEEDING_PLAN_REPLY,
+    DOMAIN,
+    FEEDING_PLAN_REPLY_OPTIONS,
+)
 
 
 class PetlibroLocalConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -76,13 +88,27 @@ class PetlibroLocalOptionsFlow(OptionsFlow):
                 )
             return self.async_create_entry(title="", data=user_input)
 
-        current_name = self._config_entry.title
+        options = self._config_entry.options
 
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(CONF_NAME, default=current_name): str,
+                    vol.Optional(
+                        CONF_NAME, default=self._config_entry.title
+                    ): str,
+                    vol.Optional(
+                        CONF_FEEDING_PLAN_REPLY,
+                        default=options.get(
+                            CONF_FEEDING_PLAN_REPLY, DEFAULT_FEEDING_PLAN_REPLY
+                        ),
+                    ): SelectSelector(
+                        SelectSelectorConfig(
+                            options=FEEDING_PLAN_REPLY_OPTIONS,
+                            translation_key=CONF_FEEDING_PLAN_REPLY,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    ),
                 }
             ),
         )

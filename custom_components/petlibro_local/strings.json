@@ -24,8 +24,20 @@
       "init": {
         "title": "Petlibro Local Options",
         "data": {
-          "name": "Device Name"
+          "name": "Device Name",
+          "feeding_plan_reply": "Answer to feeding schedule requests"
+        },
+        "data_description": {
+          "feeding_plan_reply": "On boot the feeder asks the broker what its schedule should be, and keeps asking until it gets an answer. \"Acknowledge only\" answers without touching the schedule stored on the device. \"Clear the device schedule\" sends an empty schedule, which erases the on-device feeding plans so only Home Assistant feeds the device."
         }
+      }
+    }
+  },
+  "selector": {
+    "feeding_plan_reply": {
+      "options": {
+        "ack_only": "Acknowledge only (keep the device schedule)",
+        "empty": "Clear the device schedule"
       }
     }
   },
@@ -36,6 +48,20 @@
       },
       "reboot": {
         "name": "Reboot Device"
+      },
+      "mark_cleaned": {
+        "name": "Mark cleaned"
+      },
+      "mark_refilled": {
+        "name": "Mark refilled"
+      }
+    },
+    "datetime": {
+      "last_cleaned": {
+        "name": "Last cleaned"
+      },
+      "last_refill": {
+        "name": "Last refill"
       }
     },
     "switch": {
@@ -87,6 +113,10 @@
         "payload": {
           "name": "Payload",
           "description": "Additional payload data as a dictionary."
+        },
+        "wait_for_ack": {
+          "name": "Wait for acknowledgement",
+          "description": "Wait for the device to acknowledge the command on device/service/post and fail if it does not. Turn this off for commands the device cannot answer, such as DEVICE_REBOOT."
         }
       }
     }

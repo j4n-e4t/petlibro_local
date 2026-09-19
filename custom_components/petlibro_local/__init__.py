@@ -14,6 +14,7 @@ from .const import (
     ATTR_CMD,
     ATTR_PAYLOAD,
     ATTR_PORTIONS,
+    ATTR_WAIT_FOR_ACK,
     CMD_MANUAL_FEEDING,
     CONF_MODEL,
     CONF_SERIAL,
@@ -24,46 +25,62 @@ from .const import (
     get_topics,
 )
 from .coordinator import PetlibroCoordinator
-from .helpers import PetlibroCommandError, publish_command
+from .helpers import PetlibroCommandError
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def _get_entry_from_device_id(
-    hass: HomeAssistant, device_id: str
-) -> tuple[ConfigEntry, dict] | tuple[None, None]:
-    """Get the config entry and data for a device ID.
+def _get_coordinator(hass: HomeAssistant, device_id: str) -> PetlibroCoordinator:
+    """Get the coordinator for a device registry ID.
 
     Args:
         hass: Home Assistant instance.
         device_id: Device registry ID.
 
     Returns:
-        Tuple of (ConfigEntry, entry_data) or (None, None) if not found.
+        The coordinator handling that device.
+
+    Raises:
+        PetlibroCommandError: If the device is unknown or not loaded.
     """
     device_registry = dr.async_get(hass)
     device = device_registry.async_get(device_id)
     if device is None:
-        return None, None
+        raise PetlibroCommandError(f"Device {device_id} not found")
 
-    # Find the serial from device identifiers
-    serial = None
-    for identifier in device.identifiers:
-        if identifier[0] == DOMAIN:
-            serial = identifier[1]
-            break
-
+    serial = next(
+        (
+            identifier[1]
+            for identifier in device.identifiers
+            if identifier[0] == DOMAIN
+        ),
+        None,
+    )
     if serial is None:
-        return None, None
+        raise PetlibroCommandError(
+            f"Device {device_id} is not a Petlibro Local device"
+        )
 
-    # Find the entry by serial
-    for entry_id, entry_data in hass.data.get(DOMAIN, {}).items():
-        if entry_data["config"].get(CONF_SERIAL) == serial:
-            entry = hass.config_entries.async_get_entry(entry_id)
-            if entry:
-                return entry, entry_data
+    for entry_data in hass.data.get(DOMAIN, {}).values():
+        coordinator: PetlibroCoordinator = entry_data["coordinator"]
+        if coordinator.entry.data[CONF_SERIAL] == serial:
+            return coordinator
 
-    return None, None
+    raise PetlibroCommandError(f"Device {serial} is not loaded")
+
+
+def _target_coordinators(
+    hass: HomeAssistant, call: ServiceCall
+) -> list[PetlibroCoordinator]:
+    """Resolve a service call's device_id target to coordinators."""
+    device_ids = call.data.get("device_id", [])
+    if isinstance(device_ids, str):
+        device_ids = [device_ids]
+
+    if not device_ids:
+        raise PetlibroCommandError("No device specified")
+
+    return [_get_coordinator(hass, device_id) for device_id in device_ids]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -90,7 +107,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+
     return True
+
+
+async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload the entry when its options change."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 def _register_services(hass: HomeAssistant) -> None:
@@ -101,6 +125,7 @@ def _register_services(hass: HomeAssistant) -> None:
             vol.Required("device_id"): vol.Any(cv.string, [cv.string]),
             vol.Required(ATTR_CMD): cv.string,
             vol.Optional(ATTR_PAYLOAD, default={}): vol.Any(dict, None),
+            vol.Optional(ATTR_WAIT_FOR_ACK, default=True): cv.boolean,
         }
     )
 
@@ -115,57 +140,32 @@ def _register_services(hass: HomeAssistant) -> None:
         """Handle the send_command service call."""
         cmd = call.data[ATTR_CMD]
         payload_data = call.data.get(ATTR_PAYLOAD, {}) or {}
+        wait_for_ack = call.data[ATTR_WAIT_FOR_ACK]
 
-        device_ids = call.data.get("device_id", [])
-        if isinstance(device_ids, str):
-            device_ids = [device_ids]
-
-        if not device_ids:
-            raise PetlibroCommandError("No device specified")
-
-        for device_id in device_ids:
-            entry, entry_data = _get_entry_from_device_id(hass, device_id)
-            if entry is None:
-                raise PetlibroCommandError(f"Device {device_id} not found")
-
-            await publish_command(
-                hass,
-                entry_data["topics"]["command"],
-                cmd,
-                **payload_data,
+        for coordinator in _target_coordinators(hass, call):
+            await coordinator.async_send_command(
+                cmd, expect_ack=wait_for_ack, **payload_data
             )
 
             _LOGGER.debug(
-                "Sent command %s to device %s", cmd, entry.data[CONF_SERIAL]
+                "Sent command %s to device %s",
+                cmd,
+                coordinator.entry.data[CONF_SERIAL],
             )
 
     async def async_feed(call: ServiceCall) -> None:
         """Handle the feed service call."""
         portions = call.data[ATTR_PORTIONS]
 
-        device_ids = call.data.get("device_id", [])
-        if isinstance(device_ids, str):
-            device_ids = [device_ids]
-
-        if not device_ids:
-            raise PetlibroCommandError("No device specified")
-
-        for device_id in device_ids:
-            entry, entry_data = _get_entry_from_device_id(hass, device_id)
-            if entry is None:
-                raise PetlibroCommandError(f"Device {device_id} not found")
-
-            await publish_command(
-                hass,
-                entry_data["topics"]["command"],
-                CMD_MANUAL_FEEDING,
-                grainNum=portions,
+        for coordinator in _target_coordinators(hass, call):
+            await coordinator.async_send_command(
+                CMD_MANUAL_FEEDING, grainNum=portions
             )
 
             _LOGGER.debug(
                 "Manual feeding: %d portion(s) to device %s",
                 portions,
-                entry.data[CONF_SERIAL],
+                coordinator.entry.data[CONF_SERIAL],
             )
 
     hass.services.async_register(

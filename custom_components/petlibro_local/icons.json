@@ -1,0 +1,61 @@
+{
+  "entity": {
+    "button": {
+      "feed": {
+        "default": "mdi:food-drumstick"
+      },
+      "reboot": {
+        "default": "mdi:restart"
+      },
+      "mark_cleaned": {
+        "default": "mdi:spray-bottle"
+      },
+      "mark_refilled": {
+        "default": "mdi:grain"
+      }
+    },
+    "datetime": {
+      "last_cleaned": {
+        "default": "mdi:spray-bottle"
+      },
+      "last_refill": {
+        "default": "mdi:grain"
+      }
+    },
+    "event": {
+      "grain_dispensed": {
+        "default": "mdi:shaker-outline"
+      }
+    },
+    "light": {
+      "indicator_lights": {
+        "default": "mdi:led-on",
+        "state": {
+          "off": "mdi:led-off"
+        }
+      }
+    },
+    "switch": {
+      "hardware_button_lock": {
+        "default": "mdi:lock",
+        "state": {
+          "off": "mdi:lock-open-variant"
+        }
+      },
+      "sound": {
+        "default": "mdi:volume-high",
+        "state": {
+          "off": "mdi:volume-off"
+        }
+      }
+    }
+  },
+  "services": {
+    "feed": {
+      "service": "mdi:food-drumstick"
+    },
+    "send_command": {
+      "service": "mdi:console-line"
+    }
+  }
+}
