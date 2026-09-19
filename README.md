@@ -148,16 +148,19 @@ logger:
 
 ## Icon
 
-Home Assistant resolves integration icons from
-[home-assistant/brands](https://github.com/home-assistant/brands), not from this repository.
-The files under `brands/custom_integrations/petlibro_local/` are sized to that repository's
-spec (256×256 and 512×512, square, transparent) and ready to drop into a PR there; until that
-is merged the integration shows the generic fallback icon.
+HACS serves the integration's icon from `custom_components/petlibro_local/brand/`, so it
+shows up as soon as the integration is installed — no external submission needed.
+
+Home Assistant core resolves icons from
+[home-assistant/brands](https://github.com/home-assistant/brands) instead. The identical files
+under `brands/custom_integrations/petlibro_local/` are sized to that repository's spec
+(256×256 and 512×512, square, transparent) and ready to drop into a PR there, which is what
+makes the icon appear outside HACS too.
 
 `icon.png` / `icon@2x.png` are the two-tone original. `icon-monochrome-alt.png` /
 `icon-monochrome-alt@2x.png` are a single-colour variant — the original's dark grey mark has
-very little contrast on Home Assistant's dark theme, and brands has no per-theme variants, so
-submit the monochrome pair if that matters to you.
+very little contrast on Home Assistant's dark theme, and neither HACS nor brands supports
+per-theme variants, so swap in the monochrome pair if that bothers you.
 
 Entity and action icons come from `icons.json` and need nothing external.
 
