@@ -165,7 +165,7 @@ Entity and action icons come from `icons.json` and need nothing external.
 
 A full write-up of the capture setup and the protocol — topic layout, every observed command,
 and which payloads are confirmed on the wire versus inferred — lives in `WRITEUP.md` in the
-[mqtt_bridge](https://github.com/j4n-e4t/petlibro_local) research repo.
+`mqtt_bridge` research repo alongside the packet captures it is based on.
 
 ## License
 
